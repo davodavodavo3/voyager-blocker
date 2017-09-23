@@ -1,5 +1,5 @@
 {
-  "name": "voyager-blocker",
+  "name": "davodavodavo3/voyager-blocker",
   "description": "Hook for Voyager that allows you to block access to admin side with ip's.",
   "keywords": ["laravel", "hooks", "voyager"],
   "tags": ["voyager"],
