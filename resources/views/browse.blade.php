@@ -1,121 +1,104 @@
 @extends('voyager::master')
 
 @section('css')
+	<meta name="csrf-token" content="{{ csrf_token() }}">
 
-	<style type="text/css">
-		#vueify .panel-body, #vueify .panel-bordered>.panel-body{
-			padding:0px;
-			padding-top:0px;
-		}
-	</style>
+@stop
 
-@endsection
+
+@section('page_title','edit')
+
+@section('page_header')
+	<h1 class="page-title">
+		<i class="voyager-lock"></i>
+		Blocker
+	</h1>
+@stop
+
 
 @section('content')
 
-<div class="padding-top">
+	<div class="page-content edit-add container-fluid">
+		<div class="row">
+			<div class="col-md-12">
 
-	<div id="app">	
+                <div class="alert alert-info">
+                    <strong>{{ __('voyager.generic.how_to_use') }}:</strong>
+                    <p>Create an JSON object with a key whitelist and set ip values that can visit admin side. Example: <code>{ "whitelist": ["127.0.0.1"] }</code> Be careful, don't block yourself. Update and clear code soon</p>
+                </div>
+				<div class="panel panel-bordered">
 
-		<h1 class="page-title">
-        	<i class="voyager-bar-chart"></i> Polls
-            <a href="{{ route('voyager.polls.add') }}" class="btn btn-success">
-				<i class="voyager-plus"></i> Add New
-            </a>
-        </h1>
+					<form role="form" class="form-edit-add" action="{{ route('voyager.blocker.update') }}" method="POST">
+						{{ method_field("PUT") }}
+						{{ csrf_field() }}
 
-		<div id="polls">
-			<div class="container-fluid">
-
-					<div class="panel panel-bordered">
-						<div class="panel-heading">
-							<h3 class="panel-title">Polls</h3>
-						</div>
 						<div class="panel-body">
-							
-							<table id="dataTable" class="table table-hover dataTable no-footer" role="grid" aria-describedby="dataTable_info">
-	                            <thead>
-	                                <tr role="row">
-	                                	<th class="sorting">Name</th>
-	                                	<th class="sorting">Slug</th>
-	                                	<th class="sorting">Created At</th>
-	                                	<th class="sorting">Avatar</th>
-	                                	<th class="actions sorting">Actions</th></tr>
-	                            </thead>
-	                            <tbody>
 
-	                            	@foreach($polls as $poll)
+							@if (count($errors) > 0)
+								<div class="alert alert-danger">
+									<ul>
+										@foreach ($errors->all() as $error)
+											<li>{{ $error }}</li>
+										@endforeach
+									</ul>
+								</div>
+							@endif
 
-	                            		<tr role="row" class="odd">
-	                            			<td>{{ $poll->name }}</td>
-	                            			<td>{{ $poll->slug }}</td>
-	                            			<td>{{ Carbon\Carbon::parse($poll->created_at)->toDayDateTimeString() }}</td>
-	                            			<td>{{ Carbon\Carbon::parse($poll->modified_at)->toDayDateTimeString() }}</td>
-	                            			<td>
-	                            				<div class="btn-sm btn-danger pull-right delete" data-id="{{ $poll->id }}" id="delete-1">
-	                                                <i class="voyager-trash"></i> Delete
-	                                            </div>
-	                                            <a href="{{ url(env('ROUTE_PREFIX') . '/admin/polls') . '/' . $poll->id . '/edit' }}" class="btn-sm btn-primary pull-right edit">
-	                                                <i class="voyager-edit"></i> Edit
-	                                            </a>
-	                                            <a href="{{ url(env('ROUTE_PREFIX') . '/admin/polls') . '/' . $poll->id }}" class="btn-sm btn-warning pull-right">
-	                                                <i class="voyager-eye"></i> View
-	                                            </a>
-	                                        </td>
-	                            		</tr>
+							<div class="form-group">
+								<label for="editor">Set whitelist ip's</label>
 
+                                <div id="editor" data-editor="json"></div>
 
-	                            	@endforeach
-	                                                            
-	                            </tbody>
-	                        </table>
+                                <textarea name="ips" style="display: none">@if( isset($blocker->ips) )
+                                        {{ $blocker->ips }}
+                                    @endif</textarea>
+							</div>
 
 						</div>
-					</div>
+
+						<div class="panel-footer">
+							<button type="submit" class="btn btn-primary save">{{ __('voyager.generic.save') }}</button>
+						</div>
+
+					</form>
+
+
+				</div>
+
 
 			</div>
 		</div>
-
-		<div class="modal modal-danger fade" tabindex="-1" id="delete_modal" role="dialog">
-	        <div class="modal-dialog">
-	            <div class="modal-content">
-	                <div class="modal-header">
-	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-	                                aria-hidden="true">&times;</span></button>
-	                    <h4 class="modal-title"><i class="voyager-trash"></i> Are you sure you want to delete
-	                        this Poll?</h4>
-	                </div>
-	                <div class="modal-footer">
-	                    <form action="{{ env('ROUTE_PREFIX') }}/admin/polls/delete" id="delete_form" method="POST">
-	                        {{ method_field("DELETE") }}
-	                        {{ csrf_field() }}
-	                        <input type="hidden" value="" id="delete_id" name="id">
-	                        <input type="submit" class="btn btn-danger pull-right delete-confirm"
-	                                 value="Yes, delete this poll">
-	                    </form>
-	                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Cancel</button>
-	                </div>
-	            </div><!-- /.modal-content -->
-	        </div><!-- /.modal-dialog -->
-	    </div><!-- /.modal -->
-
 	</div>
-</div>
-	
 
 @endsection
 
 @section('javascript')
 	<script>
-		$('document').ready(function(){
-			$('td').on('click', '.delete', function (e) {
-	            var form = $('#delete_form')[0];
 
-	            $('#delete_id').val( $(this).data('id') );
-	            console.log(form.action);
+        var textarea = $('textarea[name="ips"]');
 
-	            $('#delete_modal').modal('show');
-	        });
-		});
+
+        /*{
+            "whitelist": ["127.0.0.1"]
+        }*/
+        var editor = ace.edit("editor");
+        editor.setOption("maxLines", 30);
+        editor.setOption("minLines", 10);
+        editor.setTheme("ace/theme/github");
+        editor.resize();
+        editor.getSession().setMode("ace/mode/json");
+
+        if (textarea.val()) {
+            editor.setValue(JSON.stringify(JSON.parse(textarea.val()), null, 4));
+        }
+
+        window.onload = function() {
+            textarea.val(editor.getSession().getValue());
+        };
+
+        editor.getSession().on("change", function () {
+            textarea.val(editor.getSession().getValue());
+        });
+
 	</script>
 @endsection

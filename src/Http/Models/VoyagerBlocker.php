@@ -4,9 +4,9 @@ namespace VoyagerBlocker\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Blocker extends Model
+class VoyagerBlocker extends Model
 {
-	protected $table = 'voyager_blocker';
+    protected $table = 'voyager_blocker';
     protected $fillable = ['ips'];
 
 }

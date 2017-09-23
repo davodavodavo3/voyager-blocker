@@ -21,7 +21,7 @@
   "extra": {
     "hook": {
       "providers": [
-        "VoyagerBlocker\\BlockerServiceProvider"
+        "VoyagerBlocker\\VoyagerBlockerServiceProvider"
       ]
     }
   }
