@@ -1,2 +1,2 @@
 # Blocker
-This is a hook for Voyager that allows you to block access to admin side with ip's.
+This is a hook for Voyager that allows you to give access to admin side for specific ip's.
