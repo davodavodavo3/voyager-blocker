@@ -1,6 +1,6 @@
-<p align="center">
+<div align="center">
 <img width="700" src="/cover.jpg?raw=true">
-</p>
+</div>
 
 
 
