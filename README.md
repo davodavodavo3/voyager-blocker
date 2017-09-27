@@ -3,8 +3,6 @@
 </div>
 
 
+<h1 align="center"> Voyager Blocker</h1>
 
-<div>
-<p align="center"> Voyager Blocker</p>
-</div>
 This is a hook for Voyager that allows you to give access to admin side only for specific ip's.
